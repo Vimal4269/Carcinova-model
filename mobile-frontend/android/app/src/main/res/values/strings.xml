@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Carcinova</string>
+    <string name="title_activity_main">Carcinova</string>
+    <string name="package_name">com.carcinova.app</string>
+    <string name="custom_url_scheme">com.carcinova.app</string>
+</resources>

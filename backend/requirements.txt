@@ -1,0 +1,15 @@
+Flask==3.0.2
+Flask-Cors==4.0.0
+Flask-SQLAlchemy==3.1.1
+opencv-python==4.9.0.80
+numpy==1.26.4
+Werkzeug==3.0.1
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+timm
+pillow
+
+gunicorn

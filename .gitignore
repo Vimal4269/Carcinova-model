@@ -1,0 +1,20 @@
+# Node dependencies
+node_modules/
+dist/
+release/
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/instance/
+backend/uploads/*
+!backend/uploads/c9773a60321b40ec87d4171060ef4687_Normal_100x_8.jpg
+!backend/uploads/009ff88b5d784e3494e6f32122b4f5a2_osmf_002.jpg
+!backend/uploads/42192124906042a6adbf3ba5ee9ded2e_pathology_squamouscellcarcinoma10x02_b.jpg
+*.pyc
+
+# Deliverables & Local Configs
+Carcinova_Deliverables/
+.vscode/
+.idea/
+.env
