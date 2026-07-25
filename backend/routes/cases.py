@@ -60,9 +60,10 @@ def classify_case():
         result = classify_image(filepath)
         
         # Create linked slide
+        base_url = request.host_url.rstrip('/')
         new_slide = Slide(
             case_id=new_case.id, 
-            image_path=f"http://localhost:5000/uploads/{filename}",
+            image_path=f"{base_url}/uploads/{filename}",
             classification=result["classification"],
             confidence=result["confidence"]
         )
@@ -120,9 +121,10 @@ def add_slides(case_id):
         result = classify_image(filepath)
         
         # Create linked slide
+        base_url = request.host_url.rstrip('/')
         new_slide = Slide(
             case_id=case.id, 
-            image_path=f"http://localhost:5000/uploads/{filename}",
+            image_path=f"{base_url}/uploads/{filename}",
             classification=result["classification"],
             confidence=result["confidence"]
         )
@@ -192,7 +194,8 @@ def create_case():
             filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             file.save(filepath)
-            new_slide = Slide(case_id=new_case.id, image_path=f"http://localhost:5000/uploads/{filename}")
+            base_url = request.host_url.rstrip('/')
+            new_slide = Slide(case_id=new_case.id, image_path=f"{base_url}/uploads/{filename}")
             db.session.add(new_slide)
 
     db.session.commit()
