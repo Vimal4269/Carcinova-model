@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  security-scans:
-    name: SAST & Dependency Scans
+  security-and-performance:
+    name: Security Scans + Load Testing + Excel Reports
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -20,55 +20,34 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Dependency Vulnerability Scanning
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'table'
-          output: 'trivy-results.txt'
-          severity: 'CRITICAL,HIGH'
-
-      # Hardcoded Secrets Scanning
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Dependency Vulnerability Scanning (table output only, NO sarif)
+      - name: Run Trivy vulnerability scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs --severity CRITICAL,HIGH --format table --output trivy-results.txt --ignore-unfixed .
         continue-on-error: true
 
-      - name: Upload Security Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-scan-results
-          path: trivy-results.txt
-          retention-days: 30
+      # Hardcoded Secrets Scanning (manual run, NO sarif upload)
+      - name: Run Gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz | tar -xz
+          ./gitleaks detect --source . --report-format json --report-path gitleaks-results.json || true
+        continue-on-error: true
 
-  performance-tests:
-    name: k6 Load & Performance Testing
-    runs-on: ubuntu-latest
-    needs: security-scans
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          
+      # Install backend dependencies for Flask server
       - name: Install Backend Dependencies
         run: |
           cd backend
           pip install -r requirements.txt
-          
+
+      # Start Flask server in background for k6 testing
       - name: Start Background Flask Server
         run: |
           cd backend
           nohup python app.py > flask.log 2>&1 &
           sleep 5
 
+      # Install k6 for load testing
       - name: Install k6
         run: |
           sudo gpg -k
@@ -83,19 +62,22 @@ jobs:
           k6 run k6-load-test.js > k6-report.txt
         continue-on-error: true
 
+      # Generate the Enterprise Excel Report
       - name: Install Report Dependencies
-        run: pip install pandas openpyxl
+        run: pip install openpyxl
 
       - name: Generate Excel Reports
         run: python automation/backend/scripts/generate_excel_report.py
 
-      - name: Upload Performance & Excel Artifacts
+      # Upload ONLY the Excel + text reports as artifacts (NO sarif)
+      - name: Upload Enterprise Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: performance-test-results
+          name: Backend-Security-and-Performance-Reports
           path: |
             automation/backend/reports/Backend_Security_and_Performance_Report.xlsx
             automation/backend/scripts/k6-report.txt
+            trivy-results.txt
             backend/flask.log
           retention-days: 30
