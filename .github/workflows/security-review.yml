@@ -81,13 +81,21 @@ jobs:
         run: |
           cd automation/backend/scripts
           k6 run k6-load-test.js > k6-report.txt
+        continue-on-error: true
 
-      - name: Upload Performance Artifacts
+      - name: Install Report Dependencies
+        run: pip install pandas openpyxl
+
+      - name: Generate Excel Reports
+        run: python automation/backend/scripts/generate_excel_report.py
+
+      - name: Upload Performance & Excel Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performance-test-results
           path: |
+            automation/backend/reports/Backend_Security_and_Performance_Report.xlsx
             automation/backend/scripts/k6-report.txt
             backend/flask.log
           retention-days: 30

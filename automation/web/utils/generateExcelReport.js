@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function generateReport() {
-    const reportPath = path.join(__dirname, '../reports/html/mochawesome.json');
+    const reportPath = path.join(__dirname, '../reports/html/execution-report.json');
     const outputPath = path.join(__dirname, '../reports/Automation_Test_Report.xlsx');
 
     if (!fs.existsSync(reportPath)) {
