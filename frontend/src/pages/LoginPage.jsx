@@ -39,82 +39,103 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      {/* Animated Background */}
-      <div style={styles.bgGlow1}></div>
-      <div style={styles.bgGlow2}></div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f0f4f8] p-4 relative overflow-hidden font-body">
+      
+      {/* Background Decorative Element matching Carcinova theme */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
 
-      <div style={styles.card}>
-        {/* Logo */}
-        <div style={styles.logoSection}>
-          <div style={styles.logoIcon}>
-            <span className="material-symbols-outlined" style={{ fontSize: '36px', color: '#a78bfa' }}>biotech</span>
+      {/* Main Login Card - Medical Surface Container Style */}
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 sm:p-10 shadow-lg border border-outline-variant relative z-10">
+        
+        {/* Header / Brand Branding matching Sidebar */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-inverse-surface flex items-center justify-center mb-4 shadow-sm">
+            <span className="material-symbols-outlined text-3xl text-inverse-on-surface">biotech</span>
           </div>
-          <h1 style={styles.title}>Carcinova</h1>
-          <p style={styles.subtitle}>Histopathology AI Platform</p>
+          <h1 className="font-headline-md text-3xl font-bold text-on-surface tracking-tight">Carcinova</h1>
+          <p className="font-body-base text-on-surface-variant text-sm mt-1">Histopathology AI Platform</p>
         </div>
 
-        {/* Toggle */}
-        <div style={styles.toggleContainer}>
+        {/* Tab Toggle - Sign In / Register */}
+        <div className="flex bg-surface-container rounded-xl p-1 mb-6 border border-outline-variant">
           <button
+            type="button"
             onClick={() => { setIsRegister(false); setError(''); }}
-            style={!isRegister ? styles.toggleActive : styles.toggleInactive}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              !isRegister
+                ? 'bg-white text-primary shadow-sm font-bold'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
           >
             Sign In
           </button>
           <button
+            type="button"
             onClick={() => { setIsRegister(true); setError(''); }}
-            style={isRegister ? styles.toggleActive : styles.toggleInactive}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              isRegister
+                ? 'bg-white text-primary shadow-sm font-bold'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
           >
             Register
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Username</label>
-            <div style={styles.inputWrapper}>
-              <span className="material-symbols-outlined" style={styles.inputIcon}>person</span>
+        {/* Auth Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label className="font-label-md text-xs font-semibold text-on-surface uppercase tracking-wider">
+              Username
+            </label>
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-xl">person</span>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                style={styles.input}
+                className="w-full h-12 pl-11 pr-4 bg-surface border border-outline rounded-xl text-body-base text-on-surface placeholder:text-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
                 autoComplete="username"
               />
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <div style={styles.inputWrapper}>
-              <span className="material-symbols-outlined" style={styles.inputIcon}>lock</span>
+          <div className="flex flex-col gap-2">
+            <label className="font-label-md text-xs font-semibold text-on-surface uppercase tracking-wider">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-xl">lock</span>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                style={styles.input}
+                className="w-full h-12 pl-11 pr-4 bg-surface border border-outline rounded-xl text-body-base text-on-surface placeholder:text-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
                 autoComplete="current-password"
               />
             </div>
           </div>
 
           {error && (
-            <div style={styles.errorBox}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>error</span>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-danger/10 border border-danger/20 text-danger text-sm font-medium">
+              <span className="material-symbols-outlined text-lg">error</span>
               <span>{error}</span>
             </div>
           )}
 
-          <button type="submit" style={styles.submitBtn} disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 mt-2 bg-primary hover:bg-primary/90 text-on-primary font-label-large font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50"
+          >
             {loading ? (
-              <span style={styles.spinner}></span>
+              <div className="w-5 h-5 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div>
             ) : (
               <>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                <span className="material-symbols-outlined text-xl">
                   {isRegister ? 'person_add' : 'login'}
                 </span>
                 {isRegister ? 'Create Account' : 'Sign In'}
@@ -123,221 +144,22 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <p style={styles.footer}>
-          {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <span
-            onClick={() => { setIsRegister(!isRegister); setError(''); }}
-            style={styles.footerLink}
-          >
-            {isRegister ? 'Sign In' : 'Register'}
-          </span>
-        </p>
-      </div>
+        <div className="mt-8 text-center border-t border-outline-variant pt-6">
+          <p className="text-sm text-on-surface-variant">
+            {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={() => { setIsRegister(!isRegister); setError(''); }}
+              className="text-primary font-bold hover:underline ml-1 cursor-pointer"
+            >
+              {isRegister ? 'Sign In' : 'Register'}
+            </button>
+          </p>
+        </div>
 
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes float1 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(30px, -20px) scale(1.1); }
-        }
-        @keyframes float2 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-20px, 30px) scale(1.05); }
-        }
-      `}</style>
+      </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, #0f0a1a 0%, #1a1025 30%, #0d1117 100%)',
-    position: 'relative',
-    overflow: 'hidden',
-    fontFamily: "'Inter', 'Segoe UI', sans-serif",
-  },
-  bgGlow1: {
-    position: 'absolute',
-    width: '400px',
-    height: '400px',
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
-    top: '10%',
-    left: '15%',
-    animation: 'float1 8s ease-in-out infinite',
-  },
-  bgGlow2: {
-    position: 'absolute',
-    width: '350px',
-    height: '350px',
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
-    bottom: '10%',
-    right: '15%',
-    animation: 'float2 10s ease-in-out infinite',
-  },
-  card: {
-    position: 'relative',
-    zIndex: 10,
-    width: '420px',
-    padding: '40px',
-    borderRadius: '20px',
-    background: 'rgba(26, 20, 40, 0.85)',
-    backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(139, 92, 246, 0.2)',
-    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.05)',
-  },
-  logoSection: {
-    textAlign: 'center',
-    marginBottom: '28px',
-  },
-  logoIcon: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '16px',
-    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 16px',
-    border: '1px solid rgba(139, 92, 246, 0.3)',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: '700',
-    color: '#f0e6ff',
-    margin: '0 0 4px',
-    letterSpacing: '-0.5px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#8b7da8',
-    margin: 0,
-  },
-  toggleContainer: {
-    display: 'flex',
-    borderRadius: '12px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    padding: '4px',
-    marginBottom: '24px',
-    border: '1px solid rgba(255, 255, 255, 0.06)',
-  },
-  toggleActive: {
-    flex: 1,
-    padding: '10px',
-    borderRadius: '10px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-    color: '#fff',
-    transition: 'all 0.3s',
-  },
-  toggleInactive: {
-    flex: 1,
-    padding: '10px',
-    borderRadius: '10px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-    background: 'transparent',
-    color: '#8b7da8',
-    transition: 'all 0.3s',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '18px',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    fontSize: '13px',
-    fontWeight: '500',
-    color: '#a899c2',
-  },
-  inputWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    borderRadius: '12px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    padding: '0 14px',
-    transition: 'border-color 0.3s, box-shadow 0.3s',
-  },
-  inputIcon: {
-    fontSize: '20px',
-    color: '#7c6a99',
-    marginRight: '10px',
-  },
-  input: {
-    flex: 1,
-    padding: '13px 0',
-    border: 'none',
-    outline: 'none',
-    background: 'transparent',
-    color: '#e8dff5',
-    fontSize: '15px',
-    fontFamily: "'Inter', 'Segoe UI', sans-serif",
-  },
-  errorBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 14px',
-    borderRadius: '10px',
-    background: 'rgba(239, 68, 68, 0.12)',
-    border: '1px solid rgba(239, 68, 68, 0.25)',
-    color: '#fca5a5',
-    fontSize: '13px',
-  },
-  submitBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    padding: '14px',
-    borderRadius: '12px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: '600',
-    background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-    color: '#fff',
-    transition: 'all 0.3s',
-    boxShadow: '0 4px 15px rgba(124, 58, 237, 0.3)',
-    marginTop: '4px',
-  },
-  spinner: {
-    width: '20px',
-    height: '20px',
-    border: '2px solid rgba(255,255,255,0.3)',
-    borderTop: '2px solid #fff',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-  },
-  footer: {
-    textAlign: 'center',
-    fontSize: '13px',
-    color: '#7c6a99',
-    marginTop: '20px',
-  },
-  footerLink: {
-    color: '#a78bfa',
-    cursor: 'pointer',
-    fontWeight: '600',
-  },
 };
 
 export default LoginPage;

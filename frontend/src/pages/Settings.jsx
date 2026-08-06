@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   // Load initial state from localStorage or defaults
   const [magnification, setMagnification] = useState(localStorage.getItem('setting_mag') || '10x');
   const [threshold, setThreshold] = useState(localStorage.getItem('setting_threshold') || '80');
@@ -15,17 +20,50 @@ const Settings = () => {
     alert('Settings saved successfully! They will apply to all future actions.');
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <div className="p-8 max-w-4xl mx-auto flex flex-col gap-8 pb-12">
       {/* Header */}
       <div className="flex flex-col gap-1 border-b border-outline-variant pb-4">
         <h1 className="font-headline-lg text-primary font-bold">Preferences & Settings</h1>
         <p className="font-body-base text-on-surface-variant">
-          Customize your clinical workflow and diagnostic thresholds.
+          Customize your clinical workflow, user account, and diagnostic thresholds.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
+        
+        {/* Account & Security Section */}
+        <section className="bg-surface-container rounded-2xl p-6 shadow-sm border border-outline-variant">
+          <h2 className="font-title-lg text-on-surface mb-6 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">account_circle</span>
+            User Account & Session
+          </h2>
+          
+          <div className="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary text-on-primary font-bold text-lg flex items-center justify-center shadow-sm">
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div>
+                <h3 className="font-title-md text-on-surface font-semibold">{user?.username || 'Authenticated User'}</h3>
+                <p className="text-sm text-on-surface-variant">Role: Pathologist / AI Specialist</p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2.5 bg-error/10 hover:bg-error/20 text-error border border-error/30 font-label-large rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+              Sign Out
+            </button>
+          </div>
+        </section>
         
         {/* Workflow Section */}
         <section className="bg-surface-container rounded-2xl p-6 shadow-sm border border-outline-variant">
