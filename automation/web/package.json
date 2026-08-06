@@ -1,0 +1,20 @@
+{
+  "name": "carcinova-web-e2e",
+  "version": "1.0.0",
+  "description": "Enterprise Selenium E2E Automation Framework for Carcinova Web",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/**/*.test.js --timeout 60000 --reporter mochawesome --reporter-options reportDir=reports/html,reportFilename=execution-report",
+    "test:excel": "node utils/generateExcelReport.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.18.1",
+    "exceljs": "^4.4.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "mocha": "^10.3.0",
+    "chai": "^4.4.1",
+    "mochawesome": "^7.1.3"
+  }
+}
