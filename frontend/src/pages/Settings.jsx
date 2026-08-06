@@ -51,7 +51,7 @@ const Settings = () => {
               </div>
               <div>
                 <h3 className="font-title-md text-on-surface font-semibold">{user?.username || 'Authenticated User'}</h3>
-                <p className="text-sm text-on-surface-variant">Role: Pathologist / AI Specialist</p>
+                <p className="text-sm text-on-surface-variant">Role: Pathologist</p>
               </div>
             </div>
 

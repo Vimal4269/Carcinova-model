@@ -10,7 +10,7 @@ const ReportPreview = () => {
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Specialist';
+  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Pathologist';
 
   useEffect(() => {
     const fetchCaseDetails = async () => {

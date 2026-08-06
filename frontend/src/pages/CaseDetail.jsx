@@ -6,7 +6,7 @@ const CaseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Specialist';
+  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Pathologist';
   const handleMockAction = async (url) => {
     try {
       const res = await fetch('http://localhost:5000' + url, { method: 'POST' });
