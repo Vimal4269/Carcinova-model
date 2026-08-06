@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000, // 5 seconds timeout to fail quickly instead of loading infinitely
+  timeout: 20000, // 20s timeout to allow cold-start on cloud free tier
 });
 
 export const getCasesList = async () => {
