@@ -91,12 +91,8 @@ const Dashboard = () => {
     });
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/cases/classify', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await response.json();
+      const response = await api.post('/cases/classify', formData);
+      const data = response.data;
       
       if (data.success) {
         if (localStorage.getItem('setting_redirect') !== 'false') {
@@ -114,7 +110,7 @@ const Dashboard = () => {
         setError(data.message || 'Classification failed.');
       }
     } catch (err) {
-      setError('Failed to classify image. Check backend connection.');
+      setError(err.response?.data?.message || err.message || 'Failed to classify image. Check backend connection.');
     } finally {
       setClassifying(false);
     }

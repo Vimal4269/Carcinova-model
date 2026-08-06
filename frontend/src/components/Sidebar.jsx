@@ -1,8 +1,11 @@
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { name: 'Home', path: '/dashboard', icon: 'home' },
@@ -34,6 +37,11 @@ const Sidebar = () => {
     return "font-body-base text-body-base";
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <nav className="fixed left-0 top-0 h-full w-[240px] flex flex-col py-margin-page gap-stack-default bg-inverse-surface border-r border-outline dark:border-outline-variant z-50 pt-[40px]">
       <div className="px-6 mb-8 no-drag">
@@ -53,6 +61,29 @@ const Sidebar = () => {
             <span className={getIconClasses('/settings')} data-icon="settings">settings</span>
             <span className={getSpanClasses('/settings')}>Settings</span>
           </Link>
+
+          {/* User Info & Logout */}
+          {user && (
+            <div className="px-4 py-3 mx-2 mt-2 mb-2 rounded-xl no-drag" style={{ background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.15)' }}>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff' }}>
+                  {user.username?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-inverse-on-surface" style={{ margin: 0, lineHeight: 1.2 }}>{user.username}</p>
+                  <p className="text-xs text-outline-variant" style={{ margin: 0, opacity: 0.6 }}>Pathologist</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 no-drag"
+                style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.2)', cursor: 'pointer' }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>logout</span>
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

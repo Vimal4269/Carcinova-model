@@ -1,0 +1,201 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 0,
+    "passes": 0,
+    "pending": 0,
+    "failures": 0,
+    "start": "2026-08-06T04:11:35.970Z",
+    "end": "2026-08-06T04:16:43.089Z",
+    "duration": 307119,
+    "testsRegistered": 3,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 1,
+    "hasOther": true,
+    "skipped": 3,
+    "hasSkipped": true
+  },
+  "results": [
+    {
+      "uuid": "864c0900-eb62-4e3f-8f34-01dc9867e286",
+      "title": "",
+      "fullFile": "D:\\carcinova\\automation\\web\\tests\\dashboard.test.js",
+      "file": "\\tests\\dashboard.test.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+          "title": "Carcinova E2E Test Suite - Dashboard & Classification",
+          "fullFile": "D:\\carcinova\\automation\\web\\tests\\dashboard.test.js",
+          "file": "\\tests\\dashboard.test.js",
+          "beforeHooks": [
+            {
+              "title": "\"before all\" hook for \"TC_VAL_001: Should show error if Patient Name is missing\"",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification \"before all\" hook for \"TC_VAL_001: Should show error if Patient Name is missing\"",
+              "timedOut": false,
+              "duration": 307104,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "// Setup Headless Chrome\nlet options = new chrome.Options();\noptions.addArguments('--headless=new');\noptions.addArguments('--no-sandbox');\noptions.addArguments('--disable-dev-shm-usage');\noptions.addArguments('--window-size=1920,1080');\ndriver = await new Builder()\n    .forBrowser(Browser.CHROME)\n    .setChromeOptions(options)\n    .build();\ndashboardPage = new DashboardPage(driver);",
+              "err": {
+                "message": "Error: Unable to obtain browser driver.\n        For more information on how to install drivers see\n        https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location/. Error: Error executing command for D:\\carcinova\\automation\\web\\node_modules\\selenium-webdriver\\bin\\windows\\selenium-manager.exe with --browser,chrome,--language-binding,javascript,--output,json: error decoding response body for url (https://storage.googleapis.com/chrome-for-testing-public/151.0.7922.76/win64/chrome-win64.zip)",
+                "estack": "Error: Unable to obtain browser driver.\n        For more information on how to install drivers see\n        https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location/. Error: Error executing command for D:\\carcinova\\automation\\web\\node_modules\\selenium-webdriver\\bin\\windows\\selenium-manager.exe with --browser,chrome,--language-binding,javascript,--output,json: error decoding response body for url (https://storage.googleapis.com/chrome-for-testing-public/151.0.7922.76/win64/chrome-win64.zip)\n    at getBinaryPaths (node_modules\\selenium-webdriver\\common\\driverFinder.js:38:11)\n    at thenableWebDriverProxy.createSession (node_modules\\selenium-webdriver\\chromium.js:627:45)\n    at thenableWebDriverProxy.createSession (node_modules\\selenium-webdriver\\chrome.js:219:42)\n    at createDriver (node_modules\\selenium-webdriver\\index.js:154:33)\n    at Builder.build (node_modules\\selenium-webdriver\\index.js:675:16)\n    at Context.<anonymous> (tests\\dashboard.test.js:26:14)\n    at process.processImmediate (node:internal/timers:504:21)",
+                "diff": null
+              },
+              "uuid": "87bb9bde-8843-4db5-8adf-05d991816219",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": true,
+              "skipped": false
+            },
+            {
+              "title": "\"before each\" hook",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification \"before each\" hook",
+              "timedOut": false,
+              "duration": 0,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Navigate to the Dashboard before each test\nawait dashboardPage.navigateTo(BASE_URL);",
+              "err": {},
+              "uuid": "64697c27-fab5-4e27-ad4a-8fab68a9e492",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": true,
+              "skipped": false
+            }
+          ],
+          "afterHooks": [
+            {
+              "title": "\"after all\" hook in \"Carcinova E2E Test Suite - Dashboard & Classification\"",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification \"after all\" hook in \"Carcinova E2E Test Suite - Dashboard & Classification\"",
+              "timedOut": false,
+              "duration": 1,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "if (driver) {\n    await driver.quit();\n}",
+              "err": {},
+              "uuid": "6f15c950-2887-48fe-bab3-149bdd53a4f6",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": true,
+              "skipped": false
+            }
+          ],
+          "tests": [
+            {
+              "title": "TC_VAL_001: Should show error if Patient Name is missing",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification TC_VAL_001: Should show error if Patient Name is missing",
+              "timedOut": false,
+              "duration": 0,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "await dashboardPage.enterPatientDetails('', 'CASE-100');\nawait dashboardPage.clickClassify();\nconst errorMessage = await dashboardPage.getErrorMessage();\nexpect(errorMessage).to.include('Please fill out all fields');",
+              "err": {},
+              "uuid": "8c61cb33-acad-4518-a38d-fd76455d4c9e",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": false,
+              "skipped": true
+            },
+            {
+              "title": "TC_VAL_002: Should show error if Case ID is missing",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification TC_VAL_002: Should show error if Case ID is missing",
+              "timedOut": false,
+              "duration": 0,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "await dashboardPage.enterPatientDetails('John Doe', '');\nawait dashboardPage.clickClassify();\nconst errorMessage = await dashboardPage.getErrorMessage();\nexpect(errorMessage).to.include('Please fill out all fields');",
+              "err": {},
+              "uuid": "61b28bf0-bd02-4921-b603-629db9c65580",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": false,
+              "skipped": true
+            },
+            {
+              "title": "TC_VAL_003: Should show error if no file is uploaded",
+              "fullTitle": "Carcinova E2E Test Suite - Dashboard & Classification TC_VAL_003: Should show error if no file is uploaded",
+              "timedOut": false,
+              "duration": 0,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "await dashboardPage.enterPatientDetails('John Doe', 'CASE-101');\n// No file uploaded\nawait dashboardPage.clickClassify();\nconst errorMessage = await dashboardPage.getErrorMessage();\nexpect(errorMessage).to.include('Please select at least one histopathology image.');",
+              "err": {},
+              "uuid": "b7f0f259-8ce0-48de-924e-5356635a2db9",
+              "parentUUID": "7a6b812e-4b87-4eba-aae2-aa39850b70a1",
+              "isHook": false,
+              "skipped": true
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [
+            "8c61cb33-acad-4518-a38d-fd76455d4c9e",
+            "61b28bf0-bd02-4921-b603-629db9c65580",
+            "b7f0f259-8ce0-48de-924e-5356635a2db9"
+          ],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 60000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 60000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "10.8.2"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "execution-report",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "reports/html",
+        "reportFilename": "execution-report"
+      },
+      "version": "6.3.2"
+    }
+  }
+}

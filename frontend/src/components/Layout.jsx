@@ -1,7 +1,10 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 const Layout = ({ children }) => {
+  const { user } = useAuth();
+
   return (
     <div className="w-full h-screen overflow-hidden bg-surface flex">
       <Sidebar />
@@ -11,6 +14,14 @@ const Layout = ({ children }) => {
         <div className="flex items-center gap-6">
         </div>
         <div className="flex items-center gap-4">
+          {user && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.15)' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#a78bfa' }}>person</span>
+              <span className="text-sm font-medium" style={{ color: '#c4b5fd' }}>
+                {user.username}
+              </span>
+            </div>
+          )}
         </div>
       </header>
 

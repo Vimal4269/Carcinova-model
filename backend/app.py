@@ -6,6 +6,7 @@ from routes.doi import doi_bp
 from routes.history import history_bp
 from routes.cases import cases_bp
 from routes.misc import misc_bp
+from routes.auth import auth_bp
 from database.models import db
 
 def create_app():
@@ -13,6 +14,8 @@ def create_app():
     CORS(app)
     
     load_dotenv()
+    
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'carcinova-secret-key-2024')
     
     # Configure Database
     base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -40,6 +43,7 @@ def create_app():
     app.register_blueprint(history_bp, url_prefix='/api/history')
     app.register_blueprint(cases_bp, url_prefix='/api/cases')
     app.register_blueprint(misc_bp, url_prefix='/api/misc')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
     with app.app_context():
         db.create_all()
