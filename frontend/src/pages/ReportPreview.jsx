@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
+import { useAuth } from '../context/AuthContext';
 
 const ReportPreview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Specialist';
 
   useEffect(() => {
     const fetchCaseDetails = async () => {
@@ -65,7 +69,7 @@ const ReportPreview = () => {
               </div>
               <div>
                 <label className="font-label-caps text-label-caps text-outline uppercase block mb-1">Ordering Physician</label>
-                <span className="font-body-base text-body-base">Dr. Specialist</span>
+                <span className="font-body-base text-body-base font-bold text-primary">{physicianName}</span>
               </div>
             </div>
 
@@ -150,7 +154,7 @@ const ReportPreview = () => {
               </div>
               <div className="w-64">
                 <div className="h-16 border-b border-on-surface relative mb-2"></div>
-                <p className="font-body-base font-bold text-on-surface">Consulting Pathologist</p>
+                <p className="font-body-base font-bold text-on-surface">{physicianName} (Pathologist)</p>
                 <p className="font-label-caps text-label-caps text-on-surface-variant uppercase">Date: {new Date().toLocaleDateString()}</p>
               </div>
             </div>

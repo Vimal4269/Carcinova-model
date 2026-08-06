@@ -1,8 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ManualComparison = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Specialist';
   const handleMockAction = async (url) => {
     try {
       const res = await fetch('http://localhost:5000' + url, { method: 'POST' });
@@ -28,7 +31,7 @@ const ManualComparison = () => {
 <div className="mt-auto px-6 flex items-center gap-3">
 <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">P</div>
 <div className="flex flex-col">
-<span className="text-xs font-bold text-inverse-on-surface">Dr. Aristhos</span>
+<span className="text-xs font-bold text-inverse-on-surface">{physicianName}</span>
 <span className="text-[10px] text-outline-variant">Pathologist</span>
 </div>
 </div>

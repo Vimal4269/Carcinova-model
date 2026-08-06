@@ -1,9 +1,12 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const CaseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Specialist';
   const handleMockAction = async (url) => {
     try {
       const res = await fetch('http://localhost:5000' + url, { method: 'POST' });
@@ -56,7 +59,7 @@ const CaseDetail = () => {
             </div>
             <div style={styles.metaItem}>
               <span style={styles.metaLabel}>Physician</span>
-              <span style={styles.metaValue}>Dr. Smith</span>
+              <span style={styles.metaValue}>{physicianName}</span>
             </div>
           </div>
           
