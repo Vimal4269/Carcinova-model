@@ -5,19 +5,18 @@ const getBaseURL = () => {
     return import.meta.env.VITE_API_BASE_URL;
   }
   
-  // Smart detection for Android Emulator / Physical Device / Mobile WebView
+  // On Android device / emulator, 10.0.2.2 connects to host PC localhost:5000
   if (typeof window !== 'undefined') {
     const isAndroid = window.Capacitor?.getPlatform() === 'android' ||
                       navigator.userAgent.includes('Android') ||
-                      window.location.protocol === 'file:' ||
-                      window.location.hostname === 'localhost';
+                      window.location.protocol === 'file:';
 
-    if (isAndroid && window.Capacitor) {
+    if (isAndroid) {
       return 'http://10.0.2.2:5000/api';
     }
   }
 
-  return 'http://127.0.0.1:5000/api';
+  return 'http://localhost:5000/api';
 };
 
 const api = axios.create({

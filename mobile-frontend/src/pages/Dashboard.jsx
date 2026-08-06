@@ -1,59 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Activity, Search, ChevronRight, FileText, Upload, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
-import { getCasesList, classifyCase } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
-const getClassificationBadgeClass = (classification) => {
-  if (classification === 'Normal') return 'badge badge-green';
-  if (classification === 'OSCC') return 'badge badge-red';
-  if (classification === 'OSCC induced OSMF') return 'badge badge-orange';
-  return 'badge badge-gray';
+const CLASSIFICATION_STYLES = {
+  'Normal':             { bg: 'bg-success/10',  text: 'text-success',  icon: 'check_circle',  label: 'Normal' },
+  'OSCC':               { bg: 'bg-danger/10',   text: 'text-danger',   icon: 'warning',       label: 'OSCC' },
+  'OSCC induced OSMF':  { bg: 'bg-warning/10',  text: 'text-warning',  icon: 'emergency',     label: 'OSCC induced OSMF' },
+};
+
+const ClassificationBadge = ({ classification }) => {
+  const style = CLASSIFICATION_STYLES[classification] || { bg: 'bg-surface-container', text: 'text-outline-variant', icon: 'help', label: classification || 'Unknown' };
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${style.bg} ${style.text}`}>
+      <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>{style.icon}</span>
+      {style.label}
+    </span>
+  );
 };
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('classify');
-  
-  // Cases List states
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  // Classify Form states
+  const threshold = parseInt(localStorage.getItem('setting_threshold') || '80', 10);
+
+  // Form states
   const [patientName, setPatientName] = useState('');
   const [caseId, setCaseId] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [classifying, setClassifying] = useState(false);
-  const [classifyError, setClassifyError] = useState('');
+
+  // Classification result state
+  const [result, setResult] = useState(null); // { classification, confidence, doi_applicable, case_id, slide_id }
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchCases();
   }, []);
 
   const fetchCases = async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const data = await getCasesList();
-      if (data.success) {
-        setCases(data.cases || []);
-      } else {
-        setError('Failed to fetch cases from API');
+      const response = await api.get('/cases/list');
+      if (response.data.success) {
+        setCases(response.data.cases);
       }
     } catch (err) {
-      setError(err.message || 'Network error');
+      console.error("Failed to fetch cases", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this case? This action cannot be undone.")) {
+      try {
+        const response = await api.delete(`/cases/${id}`);
+        if (response.data.success) {
+          fetchCases();
+          if (result && result.case_id === id) {
+             setResult(null);
+          }
+        } else {
+          alert(response.data.message || "Failed to delete case.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error deleting case.");
+      }
+    }
+  };
+
   const handleClassify = async (e) => {
     e.preventDefault();
-    setClassifyError('');
+    setError('');
+    setResult(null);
 
     if (selectedFiles.length === 0) {
-      setClassifyError('Please select at least one histopathology slide.');
+      setError('Please select at least one histopathology image.');
       return;
     }
 
@@ -67,198 +91,258 @@ const Dashboard = () => {
     });
 
     try {
-      const data = await classifyCase(formData);
+      const response = await api.post('/cases/classify', formData);
+      const data = response.data;
+      
       if (data.success) {
+        if (localStorage.getItem('setting_redirect') !== 'false') {
+          navigate(`/case-detail/${data.case_id}`);
+          return;
+        }
+        setResult(data);
         // Reset form
         setPatientName('');
         setCaseId('');
         setSelectedFiles([]);
-        fetchCases(); // Refresh list
-
-        // Redirect to case details
-        navigate(`/case/${data.case_id}`);
+        // Refresh cases table
+        fetchCases();
       } else {
-        setClassifyError(data.message || 'Classification failed.');
+        setError(data.message || 'Classification failed.');
       }
     } catch (err) {
-      setClassifyError(err.response?.data?.message || err.message || 'Failed to classify. Check connection.');
+      setError(err.response?.data?.message || err.message || 'Failed to classify image. Check backend connection.');
     } finally {
       setClassifying(false);
     }
   };
 
   return (
-    <div className="container">
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="title flex items-center gap-2">
-            <Activity className="text-accent" />
-            PDD Mobile
-          </h1>
-          <p className="subtitle">Oral Cancer Detection &amp; DOI Analysis</p>
-        </div>
-      </header>
-
-      {/* Tabs */}
-      <div className="tabs-container">
-        <button 
-          className={`tab-btn ${activeTab === 'classify' ? 'active' : ''}`}
-          onClick={() => setActiveTab('classify')}
-        >
-          Classify Tissue
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'cases' ? 'active' : ''}`}
-          onClick={() => {
-            setActiveTab('cases');
-            fetchCases(); // Fetch latest cases
-          }}
-        >
-          Case Archive
-        </button>
+    <div className="p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-12">
+      {/* Page Header */}
+      <div className="flex flex-col gap-1 border-b border-outline-variant pb-4">
+        <h1 className="font-headline-lg text-primary font-bold">Classification Dashboard</h1>
+        <p className="font-body-base text-on-surface-variant">
+          Upload a histopathology image to classify tissue. DOI measurement is available for OSCC cases.
+        </p>
       </div>
 
-      {/* TAB CONTENT: CLASSIFY */}
-      {activeTab === 'classify' && (
-        <div className="flex-col gap-4">
-          <div className="glass-panel card flex-col">
-            <h2 className="flex items-center gap-2 mb-4" style={{ fontSize: '1.2rem', color: 'var(--accent-primary)' }}>
-              <Sparkles size={18} />
-              New Patient Case
+      <div className="flex flex-col lg:flex-row gap-8">
+
+        {/* ── Left Panel: Classify Form ── */}
+        <div className="lg:w-1/3 flex flex-col gap-4 self-start">
+          <div className="bg-surface-container rounded-2xl p-6 shadow-sm border border-outline-variant flex flex-col gap-4">
+            <h2 className="font-title-lg text-on-surface border-b border-outline-variant pb-3 mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
+              Classify Image
             </h2>
-            
-            <form onSubmit={handleClassify} className="flex-col">
-              <div className="form-group">
-                <label className="form-label">Patient Name</label>
+
+            <form onSubmit={handleClassify} className="flex flex-col gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="font-label-md text-on-surface">Patient Name</label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g., Jane Doe"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  className="form-input"
+                  className="w-full h-11 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
+                  placeholder="e.g., Jonathan Harker"
+                  required
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Case ID</label>
+              <div className="flex flex-col gap-2">
+                <label className="font-label-md text-on-surface">Case ID</label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g., PT-9982"
                   value={caseId}
                   onChange={(e) => setCaseId(e.target.value)}
-                  className="form-input"
+                  className="w-full h-11 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
+                  placeholder="e.g., PT-8829"
+                  required
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Histopathology Slide(s)</label>
-                <label className="file-upload-box">
-                  <Upload size={32} style={{ opacity: 0.6 }} />
-                  <span className="font-medium text-sm">
-                    {selectedFiles.length > 0 ? `${selectedFiles.length} Slide(s) Selected` : 'Select Slide Images'}
-                  </span>
-                  {selectedFiles.length > 0 && (
-                    <span className="text-xs" style={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {Array.from(selectedFiles).map(f => f.name).join(', ')}
-                    </span>
+              <div className="flex flex-col gap-2">
+                <label className="font-label-md text-on-surface">Histopathology Slide(s)</label>
+                <label className="relative border-2 border-dashed border-outline-variant rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer block">
+                  {selectedFiles.length > 0 ? (
+                    <div className="flex flex-col items-center gap-1 text-primary">
+                      <span className="material-symbols-outlined">collections</span>
+                      <span className="text-sm font-semibold">{selectedFiles.length} Slide(s) Selected</span>
+                      <div className="text-xs text-on-surface-variant max-w-[200px] truncate mt-1">
+                        {Array.from(selectedFiles).map(f => f.name).join(', ')}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-on-surface-variant">
+                      <span className="material-symbols-outlined text-3xl">upload_file</span>
+                      <span className="text-sm">Click to select slide(s)</span>
+                    </div>
                   )}
                   <input
+                    id="imageInput"
                     type="file"
-                    multiple
                     accept="image/*"
+                    multiple
+                    className="hidden"
                     onChange={(e) => setSelectedFiles(e.target.files || [])}
-                    style={{ display: 'none' }}
                   />
                 </label>
               </div>
 
-              {classifyError && (
-                <div className="flex items-center gap-2 mb-4 p-3 rounded" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-                  <AlertCircle size={18} />
-                  <span className="text-xs font-semibold">{classifyError}</span>
-                </div>
+              {error && (
+                <p className="text-danger text-sm bg-danger/10 px-3 py-2 rounded-lg">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={classifying}
-                className="btn mt-2"
-                style={{ width: '100%', padding: '0.85rem' }}
+                className="mt-2 w-full h-12 bg-primary text-on-primary font-label-large rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity shadow-sm flex items-center justify-center gap-2"
               >
-                {classifying ? 'Analyzing Slides...' : 'Classify & Analyze'}
+                {classifying ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                    Classifying...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>search</span>
+                    Classify & Analyze
+                  </>
+                )}
               </button>
             </form>
           </div>
-        </div>
-      )}
 
-      {/* TAB CONTENT: CASE ARCHIVE */}
-      {activeTab === 'cases' && (
-        <div className="flex-col gap-4">
-          <div className="glass-panel flex items-center p-2 mb-4" style={{ padding: '0.5rem 1rem', gap: '0.75rem' }}>
-            <Search size={20} className="text-secondary" />
-            <input
-              type="text"
-              placeholder="Search patient or case ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                width: '100%'
-              }}
-            />
+          {/* ── Classification Result Card ── */}
+          {result && (
+            <div className={`rounded-2xl p-6 border-2 flex flex-col gap-4 shadow-md animate-pulse-once ${
+              result.classification === 'Normal'
+                ? 'bg-success/5 border-success/40'
+                : 'bg-danger/5 border-danger/40'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">Classification Result</span>
+                <ClassificationBadge classification={result.classification} />
+              </div>
+
+              {/* Confidence Bar */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="font-label-md text-on-surface-variant text-sm">Confidence</span>
+                  <span className="font-bold text-on-surface">{result.confidence}%</span>
+                </div>
+                <div className="w-full h-2.5 bg-surface-container-high rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${
+                      result.classification === 'Normal' ? 'bg-success' : 'bg-danger'
+                    }`}
+                    style={{ width: `${result.confidence}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2 pt-1">
+                {result.doi_applicable ? (
+                  <>
+                    <p className="text-sm text-on-surface-variant">
+                      DOI measurement is recommended for this classification.
+                    </p>
+                    <button
+                      onClick={() => navigate(`/annotate/${result.slide_id}`)}
+                      className="w-full h-11 bg-danger text-white font-label-large rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>straighten</span>
+                      Measure DOI →
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-sm text-success font-medium flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    Normal tissue — no DOI measurement required.
+                  </p>
+                )}
+                <button
+                  onClick={() => navigate(`/case-detail/${result.case_id}`)}
+                  className="w-full h-10 border border-primary text-primary font-label-large rounded-xl hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+                >
+                  View Case Details
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── Right Panel: Recent Cases Table ── */}
+        <div className="lg:w-2/3 bg-surface-container rounded-2xl shadow-sm border border-outline-variant overflow-hidden flex flex-col self-start">
+          <div className="p-5 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
+            <h2 className="font-title-lg text-on-surface">Recent Cases</h2>
+            <button
+              onClick={fetchCases}
+              className="flex items-center justify-center p-2 rounded-full hover:bg-surface transition-colors text-on-surface-variant"
+              title="Refresh"
+            >
+              <span className="material-symbols-outlined text-[20px]">refresh</span>
+            </button>
           </div>
 
-          <div className="flex-col gap-4">
-            {loading ? (
-              <div className="flex justify-center mt-4">
-                <div className="loader"></div>
-              </div>
-            ) : error ? (
-              <div className="glass-panel card flex-col items-center justify-center text-center" style={{ color: '#ef4444', fontSize: '0.875rem' }}>
-                <AlertCircle size={18} style={{ marginBottom: '0.5rem' }} />
-                <span>{error}. Is local backend server running?</span>
-              </div>
-            ) : cases.filter(c => (c.patient_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.case_id || '').toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
-              <div className="glass-panel card flex-col items-center justify-center text-center" style={{ color: 'var(--text-secondary)' }}>
-                <FileText size={48} style={{ opacity: 0.5, marginBottom: '1rem' }} />
-                <p>No cases found.</p>
-              </div>
-            ) : (
-              cases.filter(c => (c.patient_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.case_id || '').toLowerCase().includes(searchQuery.toLowerCase())).map((c) => (
-                <Link to={`/case/${c.id}`} key={c.id} style={{ display: 'block', marginBottom: '1rem' }}>
-                  <div className="glass-panel card flex justify-between items-center">
-                    <div>
-                      <h3 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>{c.patient_name || 'Unknown Patient'}</h3>
-                      <div className="flex items-center gap-2" style={{ flexWrap: 'wrap' }}>
-                        <span className="badge badge-blue">{c.case_id}</span>
-                        {c.classification && (
-                          <span className={getClassificationBadgeClass(c.classification)}>
-                            {c.classification
-                              ? (c.classification.length > 15 ? c.classification.substring(0, 15) + '...' : c.classification)
-                              : ''}
-                          </span>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-outline-variant bg-surface-container">
+                  <th className="p-4 font-label-md text-on-surface-variant uppercase tracking-wider">Case ID</th>
+                  <th className="p-4 font-label-md text-on-surface-variant uppercase tracking-wider">Patient</th>
+                  <th className="p-4 font-label-md text-on-surface-variant uppercase tracking-wider">Classification</th>
+                  <th className="p-4 font-label-md text-on-surface-variant uppercase tracking-wider text-center">Max DOI</th>
+                  <th className="p-4 font-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan="5" className="p-8 text-center text-outline-variant">Loading cases...</td></tr>
+                ) : cases.length === 0 ? (
+                  <tr><td colSpan="5" className="p-8 text-center text-outline-variant">No cases yet. Classify an image to begin.</td></tr>
+                ) : (
+                  cases.map(c => (
+                    <tr key={c.id} onClick={() => navigate(`/case-detail/${c.id}`)} className="cursor-pointer border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+                      <td className="p-4 font-mono-data text-primary font-bold">{c.case_id}</td>
+                      <td className="p-4 font-body-base text-on-surface font-medium">{c.patient_name}</td>
+                      <td className="p-4">
+                        {c.classification
+                          ? <div className="flex items-center gap-2">
+                              <ClassificationBadge classification={c.classification} />
+                              {c.confidence && c.confidence < threshold && (
+                                <span className="material-symbols-outlined text-danger text-[18px]" title="Low Confidence">warning</span>
+                              )}
+                            </div>
+                          : <span className="text-outline-variant text-sm">—</span>
+                        }
+                      </td>
+                      <td className="p-4 font-body-base text-on-surface text-center">
+                        {c.max_doi_mm ? (
+                          <span className="font-bold">{c.max_doi_mm.toFixed(2)} mm</span>
+                        ) : (
+                          <span className="text-outline-variant text-sm">—</span>
                         )}
-                        {c.max_doi_mm && (
-                          <span className="badge badge-purple">DOI: {c.max_doi_mm} mm</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="btn-icon">
-                      <ChevronRight size={20} />
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
+                      </td>
+                      <td className="p-4 text-right flex justify-end gap-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                          className="px-3 py-1.5 border border-danger text-danger rounded-lg hover:bg-danger/10 transition-colors flex items-center justify-center"
+                          title="Delete Case"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+
+      </div>
     </div>
   );
 };
