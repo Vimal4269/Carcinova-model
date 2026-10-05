@@ -18,6 +18,11 @@ CLASSIFICATION_SEVERITY = {
     "Unknown": 0
 }
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tiff'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # ── NEW: Classification-first endpoint ──────────────────────────────────────
 @cases_bp.route('/classify', methods=['POST'])
 def classify_case():
@@ -40,6 +45,11 @@ def classify_case():
     if existing:
         return jsonify({"success": False, "message": "Case ID already exists."}), 400
 
+    # Validate file extensions first
+    for image in images:
+        if image and image.filename != '' and not allowed_file(image.filename):
+            return jsonify({"success": False, "message": f"Invalid file format for {image.filename}. Only image files are permitted."}), 400
+
     # Create the case record first
     new_case = Case(patient_name=patient_name, case_id=case_id_str)
     db.session.add(new_case)
@@ -55,6 +65,18 @@ def classify_case():
         filename = secure_filename(f"{uuid.uuid4().hex}_{image.filename}")
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         image.save(filepath)
+
+        # Validate that the file is genuinely a valid, non-corrupt image
+        try:
+            from PIL import Image as PILImage
+            with PILImage.open(filepath) as test_img:
+                test_img.verify()
+        except Exception:
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            db.session.delete(new_case)
+            db.session.commit()
+            return jsonify({"success": False, "message": f"Corrupted or invalid image payload in {image.filename}."}), 400
 
         # Run classification per slide
         result = classify_image(filepath)

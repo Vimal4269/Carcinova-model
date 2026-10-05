@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-  font-size: 20px;
-}
-
 body {
   background-color: #f0f4f8; /* Manual override for medical-grade background as per instructions */
   overflow: hidden; /* Prevent body scrolling in desktop app */
@@ -21,9 +16,11 @@ body {
   top: 0;
   left: 0;
   z-index: 1000;
+  pointer-events: none;
 }
 
 /* Ensure buttons in header are clickable */
 .no-drag {
   -webkit-app-region: no-drag;
+  pointer-events: auto;
 }

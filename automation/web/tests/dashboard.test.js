@@ -4,7 +4,7 @@ const chrome = require('selenium-webdriver/chrome');
 const { expect } = require('chai');
 const DashboardPage = require('../pages/DashboardPage');
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4173';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5174';
 
 describe('Carcinova E2E Test Suite - Authentication, Dashboard & Classification', function () {
     let driver;
