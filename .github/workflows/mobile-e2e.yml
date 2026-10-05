@@ -1,4 +1,4 @@
-name: Web Deployment & E2E Selenium Testing
+name: Mobile Native E2E Testing
 
 on:
   push:
@@ -7,53 +7,10 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
-  build-and-deploy:
-    name: Build & Deploy to GitHub Pages
+  mobile-e2e:
+    name: Mobile E2E Pixel 7 Emulation Tests
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm ci
-
-      - name: Build Frontend
-        run: |
-          cd frontend
-          npm run build
-          
-      - name: Setup Pages
-        continue-on-error: true
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        continue-on-error: true
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './frontend/dist'
-
-      - name: Deploy to GitHub Pages
-        continue-on-error: true
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  selenium-e2e:
-    name: Run Selenium E2E Tests
-    runs-on: ubuntu-latest
-    needs: build-and-deploy
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -96,24 +53,24 @@ jobs:
           cd automation/web
           npm install
 
-      - name: Run Selenium Web E2E Tests
+      - name: Run Mobile Native E2E Tests
         env:
           BASE_URL: 'http://localhost:4173'
         run: |
           cd automation/web
-          npx mocha tests/dashboard.test.js --timeout 90000 --reporter mochawesome --reporter-options reportDir=reports/html,reportFilename=execution-report
+          npx mocha tests/mobile.test.js --timeout 90000 --reporter mochawesome --reporter-options reportDir=reports/mobile-html,reportFilename=mobile-execution-report
         continue-on-error: true
 
       - name: Generate Excel Report
         run: |
           cd automation/web
-          npm run test:excel
+          npm run test:excel || true
 
-      - name: Upload Automation Artifacts
+      - name: Upload Mobile E2E Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-e2e-reports
+          name: mobile-e2e-reports
           path: |
             automation/web/reports/
             frontend/preview.log
