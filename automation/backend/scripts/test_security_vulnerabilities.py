@@ -17,6 +17,11 @@ def run_security_tests():
     passed_tests = 0
     total_tests = 6
 
+    # Ensure a user exists in the database for authentication/password testing
+    sec_user = "sec_audit_user"
+    sec_pass = "AuditPassword123!"
+    requests.post(f"{BASE_URL}/auth/register", json={"username": sec_user, "password": sec_pass})
+
     # ------------------------------------------------------------------
     # SEC-001: SQL Injection (SQLi) Defense (OWASP A03 / CWE-89)
     # ------------------------------------------------------------------
@@ -79,6 +84,9 @@ def run_security_tests():
         conn = sqlite3.connect(db_file)
         cur = conn.cursor()
         users = cur.execute("SELECT username, password_hash FROM users;").fetchall()
+        if len(users) == 0:
+            requests.post(f"{BASE_URL}/auth/register", json={"username": sec_user, "password": sec_pass})
+            users = cur.execute("SELECT username, password_hash FROM users;").fetchall()
         assert len(users) > 0, "No users in database to check"
         for u, h in users:
             assert h is not None and not h.startswith("password"), f"Plaintext password found for {u}"

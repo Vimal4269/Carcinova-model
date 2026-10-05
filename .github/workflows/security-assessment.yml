@@ -48,6 +48,11 @@ jobs:
           nohup python app.py > flask.log 2>&1 &
           sleep 5
 
+      # Initialize database with test cases
+      - name: Initialize Database API Integration
+        run: |
+          python automation/backend/scripts/test_local_database_api.py
+
       # 3. Dynamic Security Vulnerability Probes (SQLi, Auth Bypass, MIME Spoofing, Path Traversal)
       - name: Run Security & Vulnerability Probes
         run: |
