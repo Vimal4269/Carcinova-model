@@ -5,6 +5,10 @@ import uuid
 import requests
 from PIL import Image
 
+# Reconfigure stdout for utf-8 if supported
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 BASE_URL = os.environ.get('API_BASE_URL', 'http://127.0.0.1:5000/api')
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'backend'))
 UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')

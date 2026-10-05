@@ -1,4 +1,5 @@
-name: Backend Load & Performance Testing
+name: 3. Load & Performance Testing
+run-name: 3. Load & Performance Testing
 
 on:
   push:
@@ -25,6 +26,11 @@ jobs:
           cd backend
           pip install -r requirements.txt
 
+      - name: Populate Database with Clinical Test Data
+        run: |
+          cd backend
+          python populate_db.py
+
       - name: Start Background Flask Server
         run: |
           cd backend
@@ -44,11 +50,11 @@ jobs:
           cd automation/backend/scripts
           k6 run k6-load-test.js > k6-report.txt
 
-      - name: Upload Load Testing Reports
+      - name: Upload Load Testing Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Backend-Load-Test-Reports
+          name: 3-Load-Performance-Reports
           path: |
             automation/backend/scripts/k6-report.txt
             backend/flask.log

@@ -3,11 +3,13 @@ const fs = require('fs');
 const path = require('path');
 
 async function generateReport() {
-    const reportPath = path.join(__dirname, '../reports/html/execution-report.json');
+    const defaultReport = path.join(__dirname, '../reports/html/execution-report.json');
+    const mobileReport = path.join(__dirname, '../reports/mobile-html/mobile-execution-report.json');
+    const reportPath = fs.existsSync(mobileReport) ? mobileReport : defaultReport;
     const outputPath = path.join(__dirname, '../reports/Automation_Test_Report.xlsx');
 
     if (!fs.existsSync(reportPath)) {
-        console.log('Mochawesome JSON not found. Run tests first.');
+        console.log('Mochawesome JSON not found at ' + reportPath + '. Run tests first.');
         return;
     }
 

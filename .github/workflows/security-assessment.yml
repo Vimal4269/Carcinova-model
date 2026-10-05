@@ -1,4 +1,5 @@
-name: Security, SAST & Vulnerability Assessment
+name: 4. Security & Vulnerability Assessment
+run-name: 4. Security & Vulnerability Assessment
 
 on:
   push:
@@ -9,7 +10,7 @@ on:
 
 jobs:
   security-and-vulnerability:
-    name: SAST Scans + Vulnerability Probes + Excel Report
+    name: SAST Scans & Vulnerability Assessment
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -41,6 +42,12 @@ jobs:
           pip install -r requirements.txt
           pip install requests openpyxl pyjwt
 
+      # Populate Database with Clinical Test Data
+      - name: Populate Database with Clinical Test Data
+        run: |
+          cd backend
+          python populate_db.py
+
       # Start Flask server in background for security audit probes
       - name: Start Background Flask Server
         run: |
@@ -48,8 +55,8 @@ jobs:
           nohup python app.py > flask.log 2>&1 &
           sleep 5
 
-      # Initialize database with test cases
-      - name: Initialize Database API Integration
+      # Verify Database API Integration
+      - name: Verify Database API Integration
         run: |
           python automation/backend/scripts/test_local_database_api.py
 
@@ -63,11 +70,11 @@ jobs:
         run: python automation/backend/scripts/generate_excel_report.py
 
       # Upload Security Artifacts
-      - name: Upload Security Reports
+      - name: Upload Security & Vulnerability Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Security-and-Vulnerability-Reports
+          name: 4-Security-Vulnerability-Reports
           path: |
             automation/backend/reports/Backend_Security_and_Performance_Report.xlsx
             trivy-results.txt
