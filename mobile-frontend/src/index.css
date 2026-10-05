@@ -2,28 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Material Symbols ── */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   font-size: 20px;
+  user-select: none;
 }
 
-body {
-  background-color: #f0f4f8; /* Manual override for medical-grade background as per instructions */
-  overflow: hidden; /* Prevent body scrolling in desktop app */
+/* ── Base Reset for Android WebView ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
-/* Draggable header for frameless window */
-.drag-header {
-  -webkit-app-region: drag;
-  height: 30px;
+html, body {
+  height: 100%;
   width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  /* DO NOT use overflow: hidden — it breaks Android scrolling */
+  background-color: #f6fafe;
+  overscroll-behavior: none;
 }
 
-/* Ensure buttons in header are clickable */
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Safe Area Support (Android notch/nav bar) ── */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Bottom nav height + safe area */
+  --bottom-nav-height: 64px;
+  --header-height: 56px;
+}
+
+/* ── Minimum touch target (Android 48dp guideline) ── */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Override for icon-only buttons inside table/list rows */
+.touch-target-sm {
+  min-height: 36px;
+  min-width: 36px;
+}
+
+/* ── Smooth scrolling for the content area ── */
+.scroll-area {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* ── Android ripple effect simulation ── */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── No drag regions — keep for compatibility, does nothing on Android ── */
 .no-drag {
   -webkit-app-region: no-drag;
+}
+
+/* ── Print styles ── */
+@media print {
+  body {
+    background: white;
+  }
 }

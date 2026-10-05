@@ -7,7 +7,8 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
-      "colors": {
+      colors: {
+        // ── Material Design 3 color tokens ──────────────────────────────
         "on-primary-fixed-variant": "#004e5f",
         "outline-variant": "#bfc8cc",
         "secondary-container": "#c7dfff",
@@ -54,39 +55,80 @@ export default {
         "on-error-container": "#93000a",
         "surface": "#f6fafe",
         "primary-fixed": "#b2ebff",
-        "on-primary-fixed": "#001f27"
+        "on-primary-fixed": "#001f27",
+
+        // ── Semantic status colors (used across all pages) ───────────────
+        "success": "#1a7f4b",
+        "on-success": "#ffffff",
+        "success-container": "#b7f5d4",
+        "on-success-container": "#002112",
+
+        "danger": "#ba1a1a",
+        "on-danger": "#ffffff",
+        "danger-container": "#ffdad6",
+        "on-danger-container": "#93000a",
+
+        "warning": "#7a5800",
+        "on-warning": "#ffffff",
+        "warning-container": "#ffdea3",
+        "on-warning-container": "#261900",
       },
-      "borderRadius": {
-        "DEFAULT": "0.125rem",
-        "lg": "0.25rem",
-        "xl": "0.5rem",
-        "full": "0.75rem"
+
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        sm: "0.25rem",
+        md: "0.5rem",
+        lg: "0.75rem",
+        xl: "1rem",
+        "2xl": "1.25rem",
+        full: "9999px",
       },
-      "spacing": {
-        "toolbar-height": "48px",
+
+      spacing: {
+        "toolbar-height": "56px",
+        "bottom-nav-height": "64px",
         "stack-default": "16px",
-        "margin-page": "24px",
+        "margin-page": "16px",
         "gutter": "16px",
         "stack-compact": "8px",
-        "sidebar-width": "240px"
+        "sidebar-width": "240px",
       },
-      "fontFamily": {
+
+      fontFamily: {
+        body: ["Inter", "sans-serif"],
         "body-base": ["Inter", "sans-serif"],
+        "body-sm": ["Inter", "sans-serif"],
+        mono: ["Geist", "monospace"],
         "mono-data": ["Geist", "monospace"],
         "headline-md": ["Inter", "sans-serif"],
-        "body-sm": ["Inter", "sans-serif"],
         "label-caps": ["Geist", "monospace"],
-        "display-lg": ["Inter", "sans-serif"]
+        "display-lg": ["Inter", "sans-serif"],
       },
-      "fontSize": {
-        "body-base": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-        "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
-        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
-        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
-        "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
-      }
+
+      fontSize: {
+        "body-base": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+        "body-sm":   ["12px", { lineHeight: "18px", fontWeight: "400" }],
+        "mono-data": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+        "headline-sm":  ["18px", { lineHeight: "26px", fontWeight: "600" }],
+        "headline-md":  ["20px", { lineHeight: "28px", fontWeight: "600" }],
+        "headline-lg":  ["24px", { lineHeight: "32px", fontWeight: "700" }],
+        "title-sm":     ["14px", { lineHeight: "20px", fontWeight: "600" }],
+        "title-md":     ["16px", { lineHeight: "24px", fontWeight: "600" }],
+        "title-lg":     ["18px", { lineHeight: "26px", fontWeight: "600" }],
+        "label-sm":     ["11px", { lineHeight: "16px", fontWeight: "500" }],
+        "label-md":     ["12px", { lineHeight: "16px", fontWeight: "500" }],
+        "label-lg":     ["14px", { lineHeight: "20px", fontWeight: "500" }],
+        "label-large":  ["14px", { lineHeight: "20px", fontWeight: "600" }],
+        "label-caps":   ["11px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+        "display-sm":   ["24px", { lineHeight: "32px", fontWeight: "600" }],
+        "display-md":   ["30px", { lineHeight: "38px", letterSpacing: "-0.01em", fontWeight: "700" }],
+        "display-lg":   ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "600" }],
+      },
+
+      // Utility to apply font size + family as a pair via class names
+      // e.g. font-headline-md applies fontSize + fontFamily together
+      // (We rely on the font utility classes defined above)
     },
   },
   plugins: [],
-}
+};

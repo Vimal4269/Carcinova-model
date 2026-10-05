@@ -7,6 +7,7 @@ const CaseDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const physicianName = user?.username ? (user.username.toLowerCase().startsWith('dr') ? user.username : `Dr. ${user.username}`) : 'Dr. Pathologist';
+  
   const handleMockAction = async (url) => {
     try {
       const res = await fetch('http://localhost:5000' + url, { method: 'POST' });
@@ -18,108 +19,79 @@ const CaseDetail = () => {
   };
 
   return (
-    <div className="no-drag" style={{ paddingTop: '30px' }}>
-      
+    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-5 md:gap-8 pb-12 no-drag">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-label-md w-fit h-10 active:scale-[0.97]"
+      >
+        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+        Back to Dashboard
+      </button>
 
-      <div style={styles.grid}>
-        <div className="card flex-col items-center justify-center" style={styles.imageViewer}>
-          <div style={styles.imagePlaceholder}>
-            <span style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔬</span>
-            <p>Diagnostic Image Viewer</p>
-            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>High-resolution scan preview</p>
+      {/* Main Grid - stacks on mobile */}
+      <div className="flex flex-col lg:grid lg:grid-cols-[2fr_1fr] gap-5 md:gap-6">
+        {/* Image Viewer */}
+        <div className="bg-[#1E1E1E] rounded-2xl border border-outline-variant min-h-[250px] md:min-h-[500px] flex flex-col items-center justify-center">
+          <div className="text-white text-center opacity-60 flex flex-col items-center gap-2">
+            <span className="text-5xl">🔬</span>
+            <p className="font-medium">Diagnostic Image Viewer</p>
+            <p className="text-xs opacity-70">High-resolution scan preview</p>
           </div>
         </div>
 
-        <div className="flex-col gap-2">
-          <div className="card">
-            <h3 className="mb-3">DOI Result Display</h3>
-            <div style={styles.resultItem}>
-              <span style={styles.resultLabel}>Diagnosis</span>
-              <span style={{...styles.resultValue, color: 'var(--success)'}}>Normal Tissue</span>
-            </div>
-            <div style={styles.resultItem}>
-              <span style={styles.resultLabel}>Confidence Score</span>
-              <span style={styles.resultValue}>98.4%</span>
-            </div>
-            <div style={styles.resultItem}>
-              <span style={styles.resultLabel}>Analyzed Region</span>
-              <span style={styles.resultValue}>Upper Left Quadrant</span>
+        {/* Info Panel */}
+        <div className="flex flex-col gap-4">
+          {/* DOI Result */}
+          <div className="bg-surface-container rounded-2xl p-4 md:p-5 border border-outline-variant">
+            <h3 className="font-title-md text-on-surface font-semibold mb-4">DOI Result Display</h3>
+            <div className="flex flex-col divide-y divide-outline-variant">
+              <div className="flex justify-between items-center py-3">
+                <span className="text-on-surface-variant text-sm font-medium">Diagnosis</span>
+                <span className="font-semibold text-success">Normal Tissue</span>
+              </div>
+              <div className="flex justify-between items-center py-3">
+                <span className="text-on-surface-variant text-sm font-medium">Confidence Score</span>
+                <span className="font-semibold text-on-surface">98.4%</span>
+              </div>
+              <div className="flex justify-between items-center py-3">
+                <span className="text-on-surface-variant text-sm font-medium">Analyzed Region</span>
+                <span className="font-semibold text-on-surface">Upper Left Quadrant</span>
+              </div>
             </div>
           </div>
 
-          <div className="card">
-            <h3 className="mb-3">Patient Metadata</h3>
-            <div style={styles.metaItem}>
-              <span style={styles.metaLabel}>Patient ID</span>
-              <span style={styles.metaValue}>P-1042</span>
-            </div>
-            <div style={styles.metaItem}>
-              <span style={styles.metaLabel}>Age / Gender</span>
-              <span style={styles.metaValue}>45 / M</span>
-            </div>
-            <div style={styles.metaItem}>
-              <span style={styles.metaLabel}>Physician</span>
-              <span style={styles.metaValue}>{physicianName}</span>
+          {/* Patient Metadata */}
+          <div className="bg-surface-container rounded-2xl p-4 md:p-5 border border-outline-variant">
+            <h3 className="font-title-md text-on-surface font-semibold mb-4">Patient Metadata</h3>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">Patient ID</span>
+                <span className="font-medium text-on-surface">P-1042</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">Age / Gender</span>
+                <span className="font-medium text-on-surface">45 / M</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">Physician</span>
+                <span className="font-medium text-on-surface">{physicianName}</span>
+              </div>
             </div>
           </div>
           
-          <button className="primary w-full" style={{ padding: '1rem' }} onClick={() => handleMockAction('/api/misc/batch/start')}>
+          {/* Generate Report Button */}
+          <button
+            className="w-full h-12 bg-primary text-on-primary font-label-large rounded-xl hover:opacity-90 transition-opacity shadow-sm flex items-center justify-center gap-2 active:scale-[0.97]"
+            onClick={() => handleMockAction('/api/misc/batch/start')}
+          >
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
             Generate Report
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  backBtn: {
-    backgroundColor: 'var(--primary-bg)',
-    color: 'var(--text-main)',
-    border: '1px solid var(--border-color)',
-    padding: '0.5rem 1rem',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
-    gap: '1.5rem',
-  },
-  imageViewer: {
-    minHeight: '500px',
-    backgroundColor: '#1E1E1E',
-    border: '1px solid var(--border-color)',
-  },
-  imagePlaceholder: {
-    color: '#fff',
-    textAlign: 'center',
-    opacity: 0.6,
-  },
-  resultItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '0.75rem 0',
-    borderBottom: '1px solid var(--border-color)',
-  },
-  resultLabel: {
-    fontWeight: '500',
-    color: 'var(--text-muted)',
-  },
-  resultValue: {
-    fontWeight: '600',
-  },
-  metaItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    marginBottom: '1rem',
-  },
-  metaLabel: {
-    fontSize: '0.85rem',
-    color: 'var(--text-muted)',
-    marginBottom: '0.25rem',
-  },
-  metaValue: {
-    fontWeight: '500',
-  }
 };
 
 export default CaseDetail;

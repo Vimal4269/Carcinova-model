@@ -39,13 +39,19 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
+          pip install requests openpyxl
 
-      # Start Flask server in background for k6 testing
+      # Start Flask server in background for testing
       - name: Start Background Flask Server
         run: |
           cd backend
           nohup python app.py > flask.log 2>&1 &
           sleep 5
+
+      # Run Backend & Local Database Integration Test Suite
+      - name: Run Backend & Local SQLite Database Tests
+        run: |
+          python automation/backend/scripts/test_local_database_api.py
 
       # Install k6 for load testing
       - name: Install k6
@@ -56,20 +62,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install k6
 
+      # Run k6 Load Test
       - name: Run k6 Baseline Load Test
         run: |
           cd automation/backend/scripts
           k6 run k6-load-test.js > k6-report.txt
         continue-on-error: true
 
-      # Generate the Enterprise Excel Report
-      - name: Install Report Dependencies
-        run: pip install openpyxl
-
+      # Generate Enterprise Excel Report
       - name: Generate Excel Reports
         run: python automation/backend/scripts/generate_excel_report.py
 
-      # Upload ONLY the Excel + text reports as artifacts (NO sarif)
+      # Upload Enterprise Reports
       - name: Upload Enterprise Reports
         if: always()
         uses: actions/upload-artifact@v4

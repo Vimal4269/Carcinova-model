@@ -7,7 +7,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -39,7 +38,6 @@ jobs:
       - name: Build Frontend for GitHub Pages
         run: |
           cd frontend
-          # Update VITE_API_BASE_URL to point to production backend if needed
           npm run build
           
       - name: Setup Pages
@@ -62,6 +60,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Python for Backend Service
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Start Background Flask Server
+        run: |
+          cd backend
+          nohup python app.py > flask.log 2>&1 &
+          sleep 5
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -77,7 +91,6 @@ jobs:
           BASE_URL: ${{ needs.build-and-deploy.outputs.page_url }}
         run: |
           echo "Waiting for GitHub Pages deployment at $BASE_URL..."
-          # Simple curl retry loop to ensure page is up
           for i in {1..10}; do
             HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" "$BASE_URL")
             if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -96,7 +109,7 @@ jobs:
         run: |
           cd automation/web
           npm run test
-        continue-on-error: true # Continue so reports are generated
+        continue-on-error: true
 
       - name: Generate Excel Report
         run: |

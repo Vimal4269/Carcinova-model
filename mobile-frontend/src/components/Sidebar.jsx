@@ -13,9 +13,9 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
   const getLinkClasses = (path) => {
     const isActive = location.pathname.startsWith(path);
     if (isActive) {
-      return "flex items-center gap-stack-default bg-surface-container-highest text-primary border-l-4 border-primary p-3 px-6 transition-transform active:scale-90 no-drag";
+      return "flex items-center gap-stack-default bg-surface-container-highest text-primary border-l-4 border-primary px-6 min-h-[48px] transition-transform active:scale-95 no-drag";
     }
-    return "flex items-center gap-stack-default text-outline-variant hover:text-on-surface hover:bg-surface-container-high p-3 px-6 transition-colors duration-200 no-drag";
+    return "flex items-center gap-stack-default text-outline-variant hover:text-on-surface hover:bg-surface-container-high px-6 min-h-[48px] transition-colors duration-200 no-drag active:bg-surface-container-highest";
   };
 
   const getIconClasses = () => "material-symbols-outlined";
@@ -37,7 +37,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
 
       {/* Navigation Drawer */}
       <nav
-        className={`fixed left-0 top-0 h-full w-[240px] flex flex-col py-margin-page gap-stack-default bg-inverse-surface border-r border-outline dark:border-outline-variant z-50 pt-[40px] transition-transform duration-300 ${
+        className={`fixed left-0 top-0 h-full w-[280px] md:w-[240px] flex flex-col py-margin-page gap-stack-default bg-inverse-surface border-r border-outline dark:border-outline-variant z-50 pt-[40px] transition-transform duration-300 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -49,7 +49,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
           {/* Close button on mobile */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden text-outline-variant hover:text-white p-1"
+            className="md:hidden text-outline-variant hover:text-white p-2 rounded-lg active:bg-white/10"
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>

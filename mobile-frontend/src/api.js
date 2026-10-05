@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const CANDIDATES = [
+  'http://10.210.122.104:5000/api',  // PC Wi-Fi — physical device
+  'http://10.0.2.2:5000/api',        // Android emulator localhost alias
+  'http://10.143.5.104:5000/api',    // fallback PC address
   'http://localhost:5000/api',
-  'http://10.0.2.2:5000/api',
-  'http://192.168.137.215:5000/api',
   'https://carcinova-model.onrender.com/api'
 ];
 

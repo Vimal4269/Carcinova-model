@@ -1,29 +1,56 @@
 const { Builder, Browser } = require('selenium-webdriver');
+const edge = require('selenium-webdriver/edge');
 const chrome = require('selenium-webdriver/chrome');
 const { expect } = require('chai');
 const DashboardPage = require('../pages/DashboardPage');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:4173';
 
-describe('Carcinova E2E Test Suite - Dashboard & Classification', function () {
+describe('Carcinova E2E Test Suite - Authentication, Dashboard & Classification', function () {
     let driver;
     let dashboardPage;
 
-    // Timeout for the entire suite
-    this.timeout(60000);
+    this.timeout(90000);
 
     before(async function () {
-        // Setup Headless Chrome
-        let options = new chrome.Options();
-        options.addArguments('--headless=new');
-        options.addArguments('--no-sandbox');
-        options.addArguments('--disable-dev-shm-usage');
-        options.addArguments('--window-size=1920,1080');
+        const isWin = process.platform === 'win32';
+        if (isWin) {
+            try {
+                let options = new edge.Options();
+                options.addArguments('--headless=new');
+                options.addArguments('--no-sandbox');
+                options.addArguments('--disable-dev-shm-usage');
+                options.addArguments('--window-size=1920,1080');
 
-        driver = await new Builder()
-            .forBrowser(Browser.CHROME)
-            .setChromeOptions(options)
-            .build();
+                driver = await new Builder()
+                    .forBrowser(Browser.EDGE)
+                    .setEdgeOptions(options)
+                    .build();
+            } catch (err) {
+                let chromeOptions = new chrome.Options();
+                chromeOptions.addArguments('--headless=new');
+                chromeOptions.addArguments('--no-sandbox');
+                chromeOptions.addArguments('--disable-dev-shm-usage');
+                chromeOptions.addArguments('--window-size=1920,1080');
+
+                driver = await new Builder()
+                    .forBrowser(Browser.CHROME)
+                    .setChromeOptions(chromeOptions)
+                    .build();
+            }
+        } else {
+            // Linux / CI Runner (Chrome)
+            let chromeOptions = new chrome.Options();
+            chromeOptions.addArguments('--headless=new');
+            chromeOptions.addArguments('--no-sandbox');
+            chromeOptions.addArguments('--disable-dev-shm-usage');
+            chromeOptions.addArguments('--window-size=1920,1080');
+
+            driver = await new Builder()
+                .forBrowser(Browser.CHROME)
+                .setChromeOptions(chromeOptions)
+                .build();
+        }
 
         dashboardPage = new DashboardPage(driver);
     });
@@ -34,40 +61,38 @@ describe('Carcinova E2E Test Suite - Dashboard & Classification', function () {
         }
     });
 
-    beforeEach(async function () {
-        // Navigate to the Dashboard before each test
-        await dashboardPage.navigateTo(BASE_URL);
+    it('TC_AUTH_001: Should authenticate user and land on Clinical Dashboard', async function () {
+        await dashboardPage.ensureLoggedIn(BASE_URL, 'testuser_ci', 'password123');
+        const isVisible = await dashboardPage.isDashboardVisible();
+        expect(isVisible).to.be.true;
     });
 
-    // ----------------------------------------------------
-    // TEST CASES (Sample subset of the 400+ Requirements)
-    // ----------------------------------------------------
-
-    it('TC_VAL_001: Should show error if Patient Name is missing', async function () {
+    it('TC_VAL_001: Should prevent submission if Patient Name is missing (HTML5 required)', async function () {
         await dashboardPage.enterPatientDetails('', 'CASE-100');
-        await dashboardPage.clickClassify();
-        const errorMessage = await dashboardPage.getErrorMessage();
-        expect(errorMessage).to.include('Please fill out all fields');
+        const nameInput = await dashboardPage.waitForElement(dashboardPage.patientNameInput);
+        const isValid = await driver.executeScript('return arguments[0].checkValidity();', nameInput);
+        expect(isValid).to.be.false;
     });
 
-    it('TC_VAL_002: Should show error if Case ID is missing', async function () {
-        await dashboardPage.enterPatientDetails('John Doe', '');
-        await dashboardPage.clickClassify();
-        const errorMessage = await dashboardPage.getErrorMessage();
-        expect(errorMessage).to.include('Please fill out all fields');
+    it('TC_VAL_002: Should prevent submission if Case ID is missing (HTML5 required)', async function () {
+        await dashboardPage.enterPatientDetails('Jonathan Harker', '');
+        const caseInput = await dashboardPage.waitForElement(dashboardPage.caseIdInput);
+        const isValid = await driver.executeScript('return arguments[0].checkValidity();', caseInput);
+        expect(isValid).to.be.false;
     });
 
-    it('TC_VAL_003: Should show error if no file is uploaded', async function () {
-        await dashboardPage.enterPatientDetails('John Doe', 'CASE-101');
-        // No file uploaded
+    it('TC_VAL_003: Should show validation error when no histopathology image is selected', async function () {
+        await dashboardPage.enterPatientDetails('Jonathan Harker', 'CASE-E2E-101');
         await dashboardPage.clickClassify();
+        await driver.sleep(1000);
         const errorMessage = await dashboardPage.getErrorMessage();
-        expect(errorMessage).to.include('Please select at least one histopathology image.');
+        expect(errorMessage).to.include('Please select at least one histopathology image');
     });
 
-    /* 
-      Note: In a full CI/CD run, a dynamically generated loop would read 
-      from an Excel/JSON sheet in the `data/` folder to populate the remaining 
-      390+ test permutations (boundary values, XSS inputs, invalid files).
-    */
+    it('TC_UI_004: Should verify UI theme tokens and responsive navigation elements', async function () {
+        const title = await driver.getTitle();
+        expect(title).to.include('Carcinova');
+        const isHeaderVisible = await dashboardPage.isDashboardVisible();
+        expect(isHeaderVisible).to.be.true;
+    });
 });

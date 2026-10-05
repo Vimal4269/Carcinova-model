@@ -32,7 +32,7 @@ const Dashboard = () => {
   const [classifying, setClassifying] = useState(false);
 
   // Classification result state
-  const [result, setResult] = useState(null); // { classification, confidence, doi_applicable, case_id, slide_id }
+  const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -100,11 +100,9 @@ const Dashboard = () => {
           return;
         }
         setResult(data);
-        // Reset form
         setPatientName('');
         setCaseId('');
         setSelectedFiles([]);
-        // Refresh cases table
         fetchCases();
       } else {
         setError(data.message || 'Classification failed.');
@@ -117,33 +115,33 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-12">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8 pb-12">
       {/* Page Header */}
       <div className="flex flex-col gap-1 border-b border-outline-variant pb-4">
-        <h1 className="font-headline-lg text-primary font-bold">Classification Dashboard</h1>
-        <p className="font-body-base text-on-surface-variant">
+        <h1 className="text-xl md:font-headline-lg text-primary font-bold">Classification Dashboard</h1>
+        <p className="text-sm md:font-body-base text-on-surface-variant">
           Upload a histopathology image to classify tissue. DOI measurement is available for OSCC cases.
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
 
         {/* ── Left Panel: Classify Form ── */}
-        <div className="lg:w-1/3 flex flex-col gap-4 self-start">
-          <div className="bg-surface-container rounded-2xl p-6 shadow-sm border border-outline-variant flex flex-col gap-4">
+        <div className="w-full lg:w-1/3 flex flex-col gap-4 self-start">
+          <div className="bg-surface-container rounded-2xl p-4 md:p-6 shadow-sm border border-outline-variant flex flex-col gap-4">
             <h2 className="font-title-lg text-on-surface border-b border-outline-variant pb-3 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
               Classify Image
             </h2>
 
-            <form onSubmit={handleClassify} className="flex flex-col gap-5">
+            <form onSubmit={handleClassify} className="flex flex-col gap-4 md:gap-5">
               <div className="flex flex-col gap-2">
                 <label className="font-label-md text-on-surface">Patient Name</label>
                 <input
                   type="text"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  className="w-full h-11 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
+                  className="w-full h-12 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
                   placeholder="e.g., Jonathan Harker"
                   required
                 />
@@ -155,7 +153,7 @@ const Dashboard = () => {
                   type="text"
                   value={caseId}
                   onChange={(e) => setCaseId(e.target.value)}
-                  className="w-full h-11 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
+                  className="w-full h-12 px-4 bg-surface border border-outline rounded-lg text-body-base focus:border-primary focus:outline-none transition-colors"
                   placeholder="e.g., PT-8829"
                   required
                 />
@@ -163,7 +161,7 @@ const Dashboard = () => {
 
               <div className="flex flex-col gap-2">
                 <label className="font-label-md text-on-surface">Histopathology Slide(s)</label>
-                <label className="relative border-2 border-dashed border-outline-variant rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer block">
+                <label className="relative border-2 border-dashed border-outline-variant rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer block active:scale-[0.98]">
                   {selectedFiles.length > 0 ? (
                     <div className="flex flex-col items-center gap-1 text-primary">
                       <span className="material-symbols-outlined">collections</span>
@@ -196,7 +194,7 @@ const Dashboard = () => {
               <button
                 type="submit"
                 disabled={classifying}
-                className="mt-2 w-full h-12 bg-primary text-on-primary font-label-large rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity shadow-sm flex items-center justify-center gap-2"
+                className="mt-1 w-full h-12 bg-primary text-on-primary font-label-large rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity shadow-sm flex items-center justify-center gap-2 active:scale-[0.97]"
               >
                 {classifying ? (
                   <>
@@ -215,7 +213,7 @@ const Dashboard = () => {
 
           {/* ── Classification Result Card ── */}
           {result && (
-            <div className={`rounded-2xl p-6 border-2 flex flex-col gap-4 shadow-md animate-pulse-once ${
+            <div className={`rounded-2xl p-4 md:p-6 border-2 flex flex-col gap-4 shadow-md ${
               result.classification === 'Normal'
                 ? 'bg-success/5 border-success/40'
                 : 'bg-danger/5 border-danger/40'
@@ -250,7 +248,7 @@ const Dashboard = () => {
                     </p>
                     <button
                       onClick={() => navigate(`/annotate/${result.slide_id}`)}
-                      className="w-full h-11 bg-danger text-white font-label-large rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
+                      className="w-full h-12 bg-danger text-white font-label-large rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm active:scale-[0.97]"
                     >
                       <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>straighten</span>
                       Measure DOI →
@@ -264,7 +262,7 @@ const Dashboard = () => {
                 )}
                 <button
                   onClick={() => navigate(`/case-detail/${result.case_id}`)}
-                  className="w-full h-10 border border-primary text-primary font-label-large rounded-xl hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+                  className="w-full h-12 border border-primary text-primary font-label-large rounded-xl hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 active:scale-[0.97]"
                 >
                   View Case Details
                 </button>
@@ -273,20 +271,21 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* ── Right Panel: Recent Cases Table ── */}
-        <div className="lg:w-2/3 bg-surface-container rounded-2xl shadow-sm border border-outline-variant overflow-hidden flex flex-col self-start">
-          <div className="p-5 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
+        {/* ── Right Panel: Recent Cases ── */}
+        <div className="w-full lg:w-2/3 bg-surface-container rounded-2xl shadow-sm border border-outline-variant overflow-hidden flex flex-col self-start">
+          <div className="p-4 md:p-5 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
             <h2 className="font-title-lg text-on-surface">Recent Cases</h2>
             <button
               onClick={fetchCases}
-              className="flex items-center justify-center p-2 rounded-full hover:bg-surface transition-colors text-on-surface-variant"
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface transition-colors text-on-surface-variant"
               title="Refresh"
             >
               <span className="material-symbols-outlined text-[20px]">refresh</span>
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Desktop Table (hidden on mobile) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant bg-surface-container">
@@ -328,7 +327,7 @@ const Dashboard = () => {
                       <td className="p-4 text-right flex justify-end gap-2">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
-                          className="px-3 py-1.5 border border-danger text-danger rounded-lg hover:bg-danger/10 transition-colors flex items-center justify-center"
+                          className="w-10 h-10 border border-danger text-danger rounded-lg hover:bg-danger/10 transition-colors flex items-center justify-center"
                           title="Delete Case"
                         >
                           <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -339,6 +338,58 @@ const Dashboard = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card List (shown only on mobile) */}
+          <div className="md:hidden flex flex-col divide-y divide-outline-variant">
+            {loading ? (
+              <div className="p-6 text-center text-outline-variant">
+                <span className="material-symbols-outlined animate-spin text-2xl block mx-auto mb-2">progress_activity</span>
+                Loading cases...
+              </div>
+            ) : cases.length === 0 ? (
+              <div className="p-6 text-center text-outline-variant text-sm">No cases yet. Classify an image to begin.</div>
+            ) : (
+              cases.map(c => (
+                <div
+                  key={c.id}
+                  onClick={() => navigate(`/case-detail/${c.id}`)}
+                  className="p-4 flex flex-col gap-2 active:bg-surface-container-high transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono-data text-primary font-bold text-sm">{c.case_id}</span>
+                    {c.classification ? (
+                      <ClassificationBadge classification={c.classification} />
+                    ) : (
+                      <span className="text-outline-variant text-xs">—</span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-on-surface font-medium text-sm">{c.patient_name}</span>
+                    {c.max_doi_mm ? (
+                      <span className="text-xs font-bold text-on-surface">DOI: {c.max_doi_mm.toFixed(2)} mm</span>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-on-surface-variant">
+                      {c.confidence && c.confidence < threshold && (
+                        <span className="text-danger font-bold flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[14px]">warning</span>
+                          Low Confidence
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                      className="w-10 h-10 border border-danger/50 text-danger rounded-lg hover:bg-danger/10 transition-colors flex items-center justify-center"
+                      title="Delete Case"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

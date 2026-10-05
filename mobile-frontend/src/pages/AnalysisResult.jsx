@@ -63,11 +63,16 @@ const AnalysisResult = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-on-surface-variant">Loading Case Data...</div>;
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[200px] text-on-surface-variant">
+        <span className="material-symbols-outlined animate-spin text-3xl mb-2">progress_activity</span>
+        Loading Case Data...
+      </div>
+    );
   }
 
   if (!caseData) {
-    return <div className="p-8 text-danger">Case not found.</div>;
+    return <div className="p-6 text-danger">Case not found.</div>;
   }
 
   const cls = caseData.classification;
@@ -84,26 +89,26 @@ const AnalysisResult = () => {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-12">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-5 md:gap-8 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-outline-variant pb-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-outline-variant pb-4">
         <div className="flex flex-col gap-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-label-md w-fit"
+            className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-label-md w-fit h-10 active:scale-[0.97]"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
             Back to Dashboard
           </button>
           <div>
-            <h1 className="font-headline-lg text-primary font-bold">Case {caseData.case_id}</h1>
-            <p className="font-body-base text-on-surface-variant mt-1">
+            <h1 className="text-xl md:font-headline-lg text-primary font-bold">Case {caseData.case_id}</h1>
+            <p className="text-sm text-on-surface-variant mt-1">
               Patient: <span className="font-medium text-on-surface">{caseData.patient_name}</span>
             </p>
           </div>
         </div>
         <button
-          className="px-6 py-2.5 bg-primary text-on-primary rounded-xl font-label-large shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2"
+          className="w-full md:w-auto px-6 py-3 bg-primary text-on-primary rounded-xl font-label-large shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 h-12 active:scale-[0.97]"
           onClick={() => navigate(`/report-preview/${caseData.id}`)}
         >
           <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
@@ -113,22 +118,22 @@ const AnalysisResult = () => {
 
       {/* ── Classification Result Banner ── */}
       {cls && (
-        <div className={`rounded-2xl p-6 border-2 ${clsStyle.bg} ${clsStyle.border} flex flex-col gap-4`}>
-          <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className={`rounded-2xl p-4 md:p-6 border-2 ${clsStyle.bg} ${clsStyle.border} flex flex-col gap-4`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <span
-                className={`material-symbols-outlined text-4xl ${clsStyle.text}`}
+                className={`material-symbols-outlined text-3xl md:text-4xl ${clsStyle.text}`}
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 {clsStyle.icon}
               </span>
               <div>
                 <p className="text-xs uppercase tracking-widest text-on-surface-variant font-label-caps">AI Classification</p>
-                <h2 className={`text-2xl font-extrabold ${clsStyle.text}`}>{cls}</h2>
+                <h2 className={`text-xl md:text-2xl font-extrabold ${clsStyle.text}`}>{cls}</h2>
               </div>
             </div>
             {caseData.confidence && (
-              <div className="flex flex-col gap-1.5 min-w-[200px]">
+              <div className="flex flex-col gap-1.5 w-full sm:min-w-[200px] sm:max-w-[280px]">
                 <div className="flex justify-between text-sm">
                   <span className="text-on-surface-variant">Confidence</span>
                   <span className="font-bold text-on-surface">{caseData.confidence}%</span>
@@ -148,19 +153,19 @@ const AnalysisResult = () => {
           {isNormal && (
             <div className="flex items-center gap-2 text-success text-sm font-medium">
               <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              Normal tissue identified — no Depth of Invasion measurement is required for this case.
+              Normal tissue — no DOI measurement required.
             </div>
           )}
           {caseData.confidence && caseData.confidence < threshold && (
             <div className="flex items-center gap-2 text-danger text-sm font-bold bg-danger/10 p-3 rounded">
               <span className="material-symbols-outlined text-[18px]">warning</span>
-              Low AI Confidence ({caseData.confidence}%) - Manual pathologist review strongly advised.
+              Low AI Confidence ({caseData.confidence}%) - Manual review advised.
             </div>
           )}
           {doiApplicable && !caseData.max_doi_mm && (
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-warning text-[16px]">info</span>
-              <span className="text-sm text-on-surface-variant">DOI measurement is recommended. Annotate a slide below.</span>
+              <span className="text-sm text-on-surface-variant">DOI measurement recommended. Annotate a slide below.</span>
             </div>
           )}
         </div>
@@ -168,22 +173,22 @@ const AnalysisResult = () => {
 
       {/* ── DOI Metrics (only for OSCC) ── */}
       {doiApplicable && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-surface-container rounded-xl p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
-            <span className="font-label-md text-on-surface-variant mb-2">Maximum DOI</span>
-            <span className="font-display-md text-primary font-bold">
+        <div className="grid grid-cols-3 gap-3 md:gap-6">
+          <div className="bg-surface-container rounded-xl p-4 md:p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
+            <span className="font-label-md text-on-surface-variant mb-1 text-xs">Max DOI</span>
+            <span className="text-lg md:font-display-md text-primary font-bold">
               {formatDoi(caseData.max_doi_mm)}
             </span>
           </div>
-          <div className="bg-surface-container rounded-xl p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
-            <span className="font-label-md text-on-surface-variant mb-2">AJCC T-Stage</span>
-            <span className={`font-display-md font-bold ${caseData.t_stage ? 'text-on-surface' : 'text-outline-variant'}`}>
+          <div className="bg-surface-container rounded-xl p-4 md:p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
+            <span className="font-label-md text-on-surface-variant mb-1 text-xs">T-Stage</span>
+            <span className={`text-lg md:font-display-md font-bold ${caseData.t_stage ? 'text-on-surface' : 'text-outline-variant'}`}>
               {caseData.t_stage || 'Pending'}
             </span>
           </div>
-          <div className="bg-surface-container rounded-xl p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
-            <span className="font-label-md text-on-surface-variant mb-2">Clinical Risk</span>
-            <span className={`font-display-md font-bold ${
+          <div className="bg-surface-container rounded-xl p-4 md:p-6 border border-outline-variant flex flex-col items-center justify-center text-center">
+            <span className="font-label-md text-on-surface-variant mb-1 text-xs">Risk</span>
+            <span className={`text-lg md:font-display-md font-bold ${
               caseData.risk_classification === 'High' ? 'text-danger' :
               caseData.risk_classification === 'Moderate' ? 'text-warning' :
               caseData.risk_classification === 'Low' ? 'text-success' : 'text-outline-variant'
@@ -196,7 +201,7 @@ const AnalysisResult = () => {
 
       {/* ── Slides Grid ── */}
       <div>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
           <h2 className="font-title-lg text-on-surface">
             Uploaded Slides ({caseData.slides.length})
           </h2>
@@ -212,7 +217,7 @@ const AnalysisResult = () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="px-4 py-2 bg-surface-container-high border border-outline-variant hover:bg-surface-container-highest transition-colors rounded-lg font-label-md text-on-surface flex items-center gap-1.5 disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2.5 bg-surface-container-high border border-outline-variant hover:bg-surface-container-highest transition-colors rounded-lg font-label-md text-on-surface flex items-center justify-center gap-1.5 disabled:opacity-50 h-11 active:scale-[0.97]"
             >
               {uploading ? (
                 <>
@@ -228,14 +233,14 @@ const AnalysisResult = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {caseData.slides.map((slide, index) => {
             const baseHost = api.defaults.baseURL ? api.defaults.baseURL.replace('/api', '') : 'http://127.0.0.1:5000';
             const slideDoiApplicable = slide.classification === 'OSCC' || slide.classification === 'OSCC induced OSMF';
             
             return (
               <div key={slide.id} className="bg-surface rounded-xl border border-outline-variant overflow-hidden flex flex-col">
-                <div className="h-48 bg-surface-container flex items-center justify-center overflow-hidden">
+                <div className="h-40 md:h-48 bg-surface-container flex items-center justify-center overflow-hidden">
                   <img
                     src={`${baseHost}/api/doi/slide_image/${slide.id}`}
                     alt={`Slide ${index + 1}`}
@@ -270,7 +275,7 @@ const AnalysisResult = () => {
                   {slideDoiApplicable ? (
                     <button
                       onClick={() => navigate(`/annotate/${slide.id}`)}
-                      className={`w-full py-2 rounded font-label-md mt-1 transition-colors ${
+                      className={`w-full py-3 rounded-lg font-label-md mt-1 transition-colors h-12 flex items-center justify-center active:scale-[0.97] ${
                         slide.doi_mm
                           ? 'border border-primary text-primary hover:bg-primary/5'
                           : 'bg-primary text-on-primary hover:opacity-90'
@@ -279,8 +284,8 @@ const AnalysisResult = () => {
                       {slide.doi_mm ? 'Re-Measure DOI' : 'Measure DOI'}
                     </button>
                   ) : (
-                    <div className="text-xs text-success bg-success/5 p-2 rounded text-center border border-success/10 font-medium">
-                      Normal Tissue — DOI measurement not required.
+                    <div className="text-xs text-success bg-success/5 p-3 rounded text-center border border-success/10 font-medium">
+                      Normal Tissue — DOI not required.
                     </div>
                   )}
                 </div>

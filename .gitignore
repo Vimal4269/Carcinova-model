@@ -18,3 +18,8 @@ Carcinova_Deliverables/
 .vscode/
 .idea/
 .env
+
+# Binary Executables & Downloads
+*.exe
+*.zip
+*.log
